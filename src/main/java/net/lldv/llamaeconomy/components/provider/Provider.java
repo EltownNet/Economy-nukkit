@@ -2,13 +2,13 @@ package net.lldv.llamaeconomy.components.provider;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.lldv.llamaeconomy.components.universalclient.UniversalClient;
-import net.lldv.llamaeconomy.components.universalclient.data.Collection;
-import net.lldv.llamaeconomy.components.universalclient.data.CollectionFields;
-import net.lldv.llamaeconomy.components.universalclient.data.UDocument;
+import net.lldv.llamaeconomy.LlamaEconomy;
+import net.lldv.llamaeconomy.components.data.CallData;
+import net.lldv.llamaeconomy.components.data.MessageCall;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * @author LlamaDevelopment
@@ -18,46 +18,42 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class Provider {
 
-    @Getter
-    private final UniversalClient client;
+    private final LlamaEconomy plugin;
 
-    private Collection collection;
+    private MessageCall messageCall;
 
     public void init() {
-        this.collection = this.client.getCollection("money");
-        this.collection.createCollection("_id",
-                new CollectionFields("_id", CollectionFields.Type.VARCHAR, 32)
-                        .append("money", CollectionFields.Type.DOUBLE)
-        );
+        this.messageCall = new MessageCall(this.plugin);
     }
 
-    public void close() {
-        this.client.disconnect();
-    }
+    public void close() { }
 
-    public boolean hasAccount(String id) {
-        return this.collection.find("_id", id).first() != null;
+    public void hasAccount(String id, Consumer<Boolean> callback) {
+        this.messageCall.createCall((c, s) -> {
+            callback.accept(s[1].equalsIgnoreCase("true"));
+        }, CallData.REQUEST_ACCOUNTEXISTS, id);
     }
 
     public void createAccount(String id, double money) {
-        this.collection.insert(
-                new UDocument("_id", id)
-                        .append("money", money)
-        );
+        this.messageCall.createCall((c, s) -> { }, CallData.REQUEST_CREATEACCOUNT, id, money + "");
     }
 
-    public double getMoney(String id) {
-        final UDocument doc = this.collection.find("_id", id).first();
-        return doc != null ? doc.getDouble("money") : 0;
+    public void getMoney(String id, Consumer<Double> callback) {
+        this.messageCall.createCall((c, s) -> {
+            callback.accept(Double.parseDouble(s[1]));
+        }, CallData.REQUEST_GETMONEY, id);
     }
 
     public void setMoney(String id, double money) {
-        this.collection.update("_id", id, new UDocument("money", money));
+        this.messageCall.createCall((c, s) -> {
+
+        }, CallData.REQUEST_SETMONEY, id, money + "");
     }
 
     public Map<String, Double> getAll() {
-        final Map<String, Double> map = new HashMap<>();
-        this.collection.find().getAll().forEach((udoc) -> map.put(udoc.getString("_id"), udoc.getDouble("money")));
-        return map;
+        return new HashMap<>();
+        //final Map<String, Double> map = new HashMap<>();
+        //this.collection.find().getAll().forEach((udoc) -> map.put(udoc.getString("_id"), udoc.getDouble("money")));
+        //return map;
     }
 }

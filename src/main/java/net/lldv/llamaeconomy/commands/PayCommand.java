@@ -8,7 +8,6 @@ import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.utils.ConfigSection;
 import net.lldv.llamaeconomy.LlamaEconomy;
-import net.lldv.llamaeconomy.components.event.PlayerPayMoneyEvent;
 import net.lldv.llamaeconomy.components.language.Language;
 
 import java.util.concurrent.CompletableFuture;
@@ -34,46 +33,47 @@ public class PayCommand extends PluginCommand<LlamaEconomy> {
                 if (args.length >= 2) {
                     Player payer = (Player) sender;
 
-                    double senderMoney = LlamaEconomy.getAPI().getMoney(payer);
+                    LlamaEconomy.getAPI().getMoney(payer, (senderMoney) -> {
+                        try {
+                            double toPay = Double.parseDouble(args[1]);
 
-                    try {
-                        double toPay = Double.parseDouble(args[1]);
+                            if (toPay > senderMoney) {
+                                payer.sendMessage(Language.get("pay-not-enough-money"));
+                                return;
+                            }
 
-                        if (toPay > senderMoney) {
-                            payer.sendMessage(Language.get("pay-not-enough-money"));
-                            return;
-                        }
+                            if (toPay < 0) {
+                                sender.sendMessage(Language.get("invalid-amount"));
+                                return;
+                            }
 
-                        if (toPay < 0) {
+                            String target = args[0];
+                            Player playerTarget = getPlugin().getServer().getPlayer(target);
+                            if (playerTarget != null) target = playerTarget.getName();
+
+                            if (target.equals(sender.getName())) return;
+
+                            String finalTarget = target;
+                            LlamaEconomy.getAPI().hasAccount(target, (has) -> {
+                                if (!has) {
+                                    payer.sendMessage(Language.get("not-registered", finalTarget));
+                                    return;
+                                }
+
+                                LlamaEconomy.getAPI().reduceMoney(payer.getName(), toPay);
+                                LlamaEconomy.getAPI().addMoney(finalTarget, toPay);
+
+                                payer.sendMessage(Language.get("you-paid", finalTarget, getPlugin().getMonetaryUnit(), this.getPlugin().getMoneyFormat().format(toPay)));
+
+                                if (playerTarget != null) {
+                                    playerTarget.sendMessage(Language.get("paid-you", payer.getName(), this.getPlugin().getMonetaryUnit(), this.getPlugin().getMoneyFormat().format(toPay)));
+                                }
+                            });
+                        } catch (Exception ex) {
                             sender.sendMessage(Language.get("invalid-amount"));
-                            return;
+                            ex.printStackTrace();
                         }
-
-                        String target = args[0];
-                        Player playerTarget = getPlugin().getServer().getPlayer(target);
-                        if (playerTarget != null) target = playerTarget.getName();
-
-                        if (target.equals(sender.getName())) return;
-
-                        if (!LlamaEconomy.getAPI().hasAccount(target)) {
-                            payer.sendMessage(Language.get("not-registered", target));
-                            return;
-                        }
-
-                        LlamaEconomy.getAPI().reduceMoney(payer.getName(), toPay);
-                        LlamaEconomy.getAPI().addMoney(target, toPay);
-
-                        payer.sendMessage(Language.get("you-paid", target, getPlugin().getMonetaryUnit(), this.getPlugin().getMoneyFormat().format(toPay)));
-
-                        if (playerTarget != null) {
-                            playerTarget.sendMessage(Language.get("paid-you", payer.getName(), this.getPlugin().getMonetaryUnit(), this.getPlugin().getMoneyFormat().format(toPay)));
-                        }
-
-                        if (sender.isPlayer()) Server.getInstance().getPluginManager().callEvent(new PlayerPayMoneyEvent((Player) sender, target, toPay));
-
-                    } catch (NumberFormatException ex) {
-                        sender.sendMessage(Language.get("invalid-amount"));
-                    }
+                    });
 
                 } else sender.sendMessage(Language.get("usage", getUsage()));
             }

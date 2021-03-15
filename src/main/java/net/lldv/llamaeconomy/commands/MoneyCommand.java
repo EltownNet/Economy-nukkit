@@ -24,26 +24,29 @@ public class MoneyCommand extends PluginCommand<LlamaEconomy> {
 
     @Override
     public boolean execute(CommandSender sender, String s, String[] args) {
-        CompletableFuture.runAsync(() -> {
-            if (args.length >= 1) {
-                String target = args[0];
-                Player playerTarget = getPlugin().getServer().getPlayer(target);
-                if (playerTarget != null) target = playerTarget.getName();
+        if (args.length >= 1) {
+            String target = args[0];
+            Player playerTarget = getPlugin().getServer().getPlayer(target);
+            if (playerTarget != null) target = playerTarget.getName();
 
-                if (!LlamaEconomy.getAPI().hasAccount(target)) {
-                    sender.sendMessage(Language.get("not-registered", target));
+            String finalTarget = target;
+            LlamaEconomy.getAPI().hasAccount(target, (has) -> {
+                if (!has) {
+                    sender.sendMessage(Language.get("not-registered", finalTarget));
                     return;
                 }
 
-                double money = LlamaEconomy.getAPI().getMoney(target);
-                sender.sendMessage(Language.get("money-other", target, getPlugin().getMonetaryUnit(), getPlugin().getMoneyFormat().format(money)));
-            } else {
-                if (sender.isPlayer()) {
-                    double money = LlamaEconomy.getAPI().getMoney(sender.getName());
+                LlamaEconomy.getAPI().getMoney(finalTarget, (money) -> {
+                    sender.sendMessage(Language.get("money-other", finalTarget, getPlugin().getMonetaryUnit(), getPlugin().getMoneyFormat().format(money)));
+                });
+            });
+        } else {
+            if (sender.isPlayer()) {
+                LlamaEconomy.getAPI().getMoney(sender.getName(), (money) -> {
                     sender.sendMessage(Language.get("money", getPlugin().getMonetaryUnit(), getPlugin().getMoneyFormat().format(money)));
-                }
+                });
             }
-        });
+        }
         return false;
     }
 }

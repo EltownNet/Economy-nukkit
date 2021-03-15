@@ -8,7 +8,6 @@ import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.utils.ConfigSection;
 import net.lldv.llamaeconomy.LlamaEconomy;
-import net.lldv.llamaeconomy.components.event.PlayerAddMoneyEvent;
 import net.lldv.llamaeconomy.components.language.Language;
 
 import java.util.concurrent.CompletableFuture;
@@ -38,23 +37,23 @@ public class AddMoneyCommand extends PluginCommand<LlamaEconomy> {
                     Player playerTarget = getPlugin().getServer().getPlayer(target);
                     if (playerTarget != null) target = playerTarget.getName();
 
-                    if (!LlamaEconomy.getAPI().hasAccount(target)) {
-                        sender.sendMessage(Language.get("not-registered", target));
-                        return;
-                    }
+                    String finalTarget = target;
+                    LlamaEconomy.getAPI().hasAccount(target, (has) -> {
+                        if (!has) {
+                            sender.sendMessage(Language.get("not-registered", finalTarget));
+                            return;
+                        }
 
-                    double amt = Double.parseDouble(args[1]);
+                        double amt = Double.parseDouble(args[1]);
 
-                    if (amt < 0) {
-                        sender.sendMessage(Language.get("invalid-amount"));
-                        return;
-                    }
+                        if (amt < 0) {
+                            sender.sendMessage(Language.get("invalid-amount"));
+                            return;
+                        }
 
-                    LlamaEconomy.getAPI().addMoney(target, amt);
-                    if (sender.isPlayer())
-                        Server.getInstance().getPluginManager().callEvent(new PlayerAddMoneyEvent((Player) sender, target, amt));
-                    sender.sendMessage(Language.get("added-money", target, getPlugin().getMonetaryUnit(), this.getPlugin().getMoneyFormat().format(amt)));
-
+                        LlamaEconomy.getAPI().addMoney(finalTarget, amt);
+                        sender.sendMessage(Language.get("added-money", finalTarget, getPlugin().getMonetaryUnit(), this.getPlugin().getMoneyFormat().format(amt)));
+                    });
                 } catch (NumberFormatException ex) {
                     sender.sendMessage(Language.get("invalid-amount"));
                 }

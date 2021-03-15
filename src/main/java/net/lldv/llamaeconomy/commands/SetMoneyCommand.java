@@ -8,7 +8,6 @@ import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.utils.ConfigSection;
 import net.lldv.llamaeconomy.LlamaEconomy;
-import net.lldv.llamaeconomy.components.event.PlayerSetMoneyEvent;
 import net.lldv.llamaeconomy.components.language.Language;
 
 import java.util.concurrent.CompletableFuture;
@@ -33,31 +32,33 @@ public class SetMoneyCommand extends PluginCommand<LlamaEconomy> {
         if (!sender.hasPermission(getPermission())) return false;
         CompletableFuture.runAsync(() -> {
             if (args.length >= 2) {
-                try {
-                    String target = args[0];
-                    Player playerTarget = getPlugin().getServer().getPlayer(target);
-                    if (playerTarget != null) target = playerTarget.getName();
+                String target = args[0];
+                Player playerTarget = getPlugin().getServer().getPlayer(target);
+                if (playerTarget != null) target = playerTarget.getName();
 
-                    if (!LlamaEconomy.getAPI().hasAccount(target)) {
-                        sender.sendMessage(Language.get("not-registered", target));
-                        return;
-                    }
+                String finalTarget = target;
+                LlamaEconomy.getAPI().hasAccount(target, (has) -> {
+                    try {
+                        if (!has) {
+                            sender.sendMessage(Language.get("not-registered", finalTarget));
+                            return;
+                        }
 
-                    double amt = Double.parseDouble(args[1]);
+                        double amt = Double.parseDouble(args[1]);
 
-                    if (amt < 0) {
+                        if (amt < 0) {
+                            sender.sendMessage(Language.get("invalid-amount"));
+                            return;
+                        }
+
+                        LlamaEconomy.getAPI().setMoney(finalTarget, amt);
+                        sender.sendMessage(Language.get("set-money", finalTarget, getPlugin().getMonetaryUnit(), this.getPlugin().getMoneyFormat().format(amt)));
+                    } catch (NumberFormatException ex) {
                         sender.sendMessage(Language.get("invalid-amount"));
-                        return;
                     }
+                });
 
-                    LlamaEconomy.getAPI().setMoney(target, amt);
-                    if (sender.isPlayer())
-                        Server.getInstance().getPluginManager().callEvent(new PlayerSetMoneyEvent((Player) sender, target, amt));
-                    sender.sendMessage(Language.get("set-money", target, getPlugin().getMonetaryUnit(), this.getPlugin().getMoneyFormat().format(amt)));
 
-                } catch (NumberFormatException ex) {
-                    sender.sendMessage(Language.get("invalid-amount"));
-                }
             } else sender.sendMessage(Language.get("usage", getUsage()));
         });
         return false;
