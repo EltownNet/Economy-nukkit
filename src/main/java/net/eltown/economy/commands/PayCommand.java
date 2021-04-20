@@ -1,20 +1,19 @@
-package net.lldv.llamaeconomy.commands;
+package net.eltown.economy.commands;
 
 import cn.nukkit.Player;
-import cn.nukkit.Server;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.PluginCommand;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.utils.ConfigSection;
-import net.lldv.llamaeconomy.LlamaEconomy;
-import net.lldv.llamaeconomy.components.language.Language;
+import net.eltown.economy.components.language.Language;
+import net.eltown.economy.Economy;
 
 import java.util.concurrent.CompletableFuture;
 
-public class PayCommand extends PluginCommand<LlamaEconomy> {
+public class PayCommand extends PluginCommand<Economy> {
 
-    public PayCommand(LlamaEconomy owner, ConfigSection section) {
+    public PayCommand(Economy owner, ConfigSection section) {
         super(section.getString("Name"), owner);
         setDescription(section.getString("Description"));
         setUsage(section.getString("Usage"));
@@ -33,7 +32,7 @@ public class PayCommand extends PluginCommand<LlamaEconomy> {
                 if (args.length >= 2) {
                     Player payer = (Player) sender;
 
-                    LlamaEconomy.getAPI().getMoney(payer, (senderMoney) -> {
+                    Economy.getAPI().getMoney(payer, (senderMoney) -> {
                         try {
                             double toPay = Double.parseDouble(args[1]);
 
@@ -54,14 +53,14 @@ public class PayCommand extends PluginCommand<LlamaEconomy> {
                             if (target.equals(sender.getName())) return;
 
                             String finalTarget = target;
-                            LlamaEconomy.getAPI().hasAccount(target, (has) -> {
+                            Economy.getAPI().hasAccount(target, (has) -> {
                                 if (!has) {
                                     payer.sendMessage(Language.get("not-registered", finalTarget));
                                     return;
                                 }
 
-                                LlamaEconomy.getAPI().reduceMoney(payer.getName(), toPay);
-                                LlamaEconomy.getAPI().addMoney(finalTarget, toPay);
+                                Economy.getAPI().reduceMoney(payer.getName(), toPay);
+                                Economy.getAPI().addMoney(finalTarget, toPay);
 
                                 payer.sendMessage(Language.get("you-paid", finalTarget, getPlugin().getMonetaryUnit(), this.getPlugin().getMoneyFormat().format(toPay)));
 

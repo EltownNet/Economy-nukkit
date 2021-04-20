@@ -1,4 +1,4 @@
-package net.lldv.llamaeconomy.commands;
+package net.eltown.economy.commands;
 
 import cn.nukkit.Player;
 import cn.nukkit.command.CommandSender;
@@ -6,14 +6,12 @@ import cn.nukkit.command.PluginCommand;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.utils.ConfigSection;
-import net.lldv.llamaeconomy.LlamaEconomy;
-import net.lldv.llamaeconomy.components.language.Language;
+import net.eltown.economy.Economy;
+import net.eltown.economy.components.language.Language;
 
-import java.util.concurrent.CompletableFuture;
+public class MoneyCommand extends PluginCommand<Economy> {
 
-public class MoneyCommand extends PluginCommand<LlamaEconomy> {
-
-    public MoneyCommand(LlamaEconomy owner, ConfigSection section) {
+    public MoneyCommand(Economy owner, ConfigSection section) {
         super(section.getString("Name"), owner);
         setDescription(section.getString("Description"));
         setUsage(section.getString("Usage"));
@@ -30,19 +28,19 @@ public class MoneyCommand extends PluginCommand<LlamaEconomy> {
             if (playerTarget != null) target = playerTarget.getName();
 
             String finalTarget = target;
-            LlamaEconomy.getAPI().hasAccount(target, (has) -> {
+            Economy.getAPI().hasAccount(target, (has) -> {
                 if (!has) {
                     sender.sendMessage(Language.get("not-registered", finalTarget));
                     return;
                 }
 
-                LlamaEconomy.getAPI().getMoney(finalTarget, (money) -> {
+                Economy.getAPI().getMoney(finalTarget, (money) -> {
                     sender.sendMessage(Language.get("money-other", finalTarget, getPlugin().getMonetaryUnit(), getPlugin().getMoneyFormat().format(money)));
                 });
             });
         } else {
             if (sender.isPlayer()) {
-                LlamaEconomy.getAPI().getMoney(sender.getName(), (money) -> {
+                Economy.getAPI().getMoney(sender.getName(), (money) -> {
                     sender.sendMessage(Language.get("money", getPlugin().getMonetaryUnit(), getPlugin().getMoneyFormat().format(money)));
                 });
             }

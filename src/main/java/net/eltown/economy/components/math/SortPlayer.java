@@ -1,4 +1,4 @@
-package net.lldv.llamaeconomy.components.math;
+package net.eltown.economy.components.math;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

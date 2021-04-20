@@ -1,19 +1,19 @@
-package net.lldv.llamaeconomy.commands;
+package net.eltown.economy.commands;
 
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.PluginCommand;
 import cn.nukkit.utils.ConfigSection;
-import net.lldv.llamaeconomy.LlamaEconomy;
-import net.lldv.llamaeconomy.components.language.Language;
+import net.eltown.economy.Economy;
+import net.eltown.economy.components.language.Language;
 
 /**
  * @author LlamaDevelopment
  * @project LlamaEconomy
  * @website http://llamadevelopment.net/
  */
-public class LecoReloadCommand extends PluginCommand<LlamaEconomy> {
+public class LecoReloadCommand extends PluginCommand<Economy> {
 
-    public LecoReloadCommand(LlamaEconomy owner, ConfigSection section) {
+    public LecoReloadCommand(Economy owner, ConfigSection section) {
         super(section.getString("Name"), owner);
         setDescription(section.getString("Description"));
         setUsage(section.getString("Usage"));

@@ -1,7 +1,7 @@
-package net.lldv.llamaeconomy.components.language;
+package net.eltown.economy.components.language;
 
 import cn.nukkit.utils.Config;
-import net.lldv.llamaeconomy.LlamaEconomy;
+import net.eltown.economy.Economy;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +11,7 @@ public class Language {
     private final static Map<String, String> messages = new HashMap<>();
     private static String prefix;
 
-    public static void init(final LlamaEconomy plugin) {
+    public static void init(final Economy plugin) {
         messages.clear();
         plugin.saveResource("messages.yml");
         Config m = new Config(plugin.getDataFolder() + "/messages.yml");

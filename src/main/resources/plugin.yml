@@ -1,7 +1,7 @@
 name: Economy
 api: 1.0.0
 version: 1.0.0
-main: net.lldv.llamaeconomy.LlamaEconomy
+main: net.eltown.economy.Economy
 author: Proxma
 description: Wirtschaftssystem basierend auf LlamaEconomy.
 softdepend:

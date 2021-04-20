@@ -1,23 +1,21 @@
-package net.lldv.llamaeconomy.commands;
+package net.eltown.economy.commands;
 
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.PluginCommand;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.utils.ConfigSection;
-import net.lldv.llamaeconomy.LlamaEconomy;
-import net.lldv.llamaeconomy.components.language.Language;
-import net.lldv.llamaeconomy.components.math.SortPlayer;
+import net.eltown.economy.components.math.SortPlayer;
+import net.eltown.economy.Economy;
+import net.eltown.economy.components.language.Language;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
-public class TopMoneyCommand extends PluginCommand<LlamaEconomy> {
+public class TopMoneyCommand extends PluginCommand<Economy> {
 
-    public TopMoneyCommand(LlamaEconomy owner, ConfigSection section) {
+    public TopMoneyCommand(Economy owner, ConfigSection section) {
         super(section.getString("Name"), owner);
         this.setDescription(section.getString("Description"));
         this.setUsage(section.getString("Usage"));
@@ -28,7 +26,7 @@ public class TopMoneyCommand extends PluginCommand<LlamaEconomy> {
 
     @Override
     public boolean execute(CommandSender sender, String s, String[] args) {
-        LlamaEconomy.getAPI().getAll(all -> {
+        Economy.getAPI().getAll(all -> {
             List<SortPlayer> sortPlayers = new ArrayList<>();
             all.forEach((string, money) -> sortPlayers.add(new SortPlayer(string, money)));
             sortPlayers.sort(Comparator.comparing(SortPlayer::getMoney).reversed());

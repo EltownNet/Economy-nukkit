@@ -1,10 +1,9 @@
-package net.lldv.llamaeconomy.components.api;
+package net.eltown.economy.components.api;
 
 import cn.nukkit.Player;
-import cn.nukkit.Server;
 import lombok.RequiredArgsConstructor;
-import net.lldv.llamaeconomy.LlamaEconomy;
-import net.lldv.llamaeconomy.components.provider.Provider;
+import net.eltown.economy.components.provider.Provider;
+import net.eltown.economy.Economy;
 
 import java.text.DecimalFormat;
 import java.util.Map;
@@ -15,7 +14,7 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor
 public class API {
 
-    private final LlamaEconomy plugin;
+    private final Economy plugin;
     private final Provider provider;
 
     public void hasAccount(Player player, Consumer<Boolean> callback) {
