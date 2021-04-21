@@ -11,6 +11,7 @@ import net.eltown.economy.components.language.Language;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 public class TopMoneyCommand extends PluginCommand<Economy> {

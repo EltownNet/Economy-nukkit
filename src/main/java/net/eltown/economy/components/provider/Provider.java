@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import net.eltown.economy.Economy;
 import net.eltown.economy.components.data.CallData;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -40,10 +42,18 @@ public class Provider {
         this.plugin.getRabbit().sendAndReceive((delivery -> {}), "economy", CallData.REQUEST_SETMONEY.name(), id, String.valueOf(money));
     }
 
-    public Map<String, Double> getAll() {
-        return new HashMap<>();
-        //final Map<String, Double> map = new HashMap<>();
-        //this.collection.find().getAll().forEach((udoc) -> map.put(udoc.getString("_id"), udoc.getDouble("money")));
-        //return map;
+    public void getAll(Consumer<Map<String, Double>> callback) {
+        final Map<String, Double> map = new HashMap<>();
+        this.plugin.getRabbit().sendAndReceive((delivery -> {
+
+            List<String> list = Arrays.asList(delivery.getData());
+            list.forEach((str) -> {
+                if (!str.equals(delivery.getKey().toLowerCase())) {
+                    map.put(str.split(":")[0], Double.parseDouble(str.split(":")[1]));
+                }
+            });
+            callback.accept(map);
+
+        }), "economy", CallData.REQUEST_GETALL.name());
     }
 }

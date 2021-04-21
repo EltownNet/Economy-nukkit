@@ -2,6 +2,7 @@ package net.eltown.economy.components.api;
 
 import cn.nukkit.Player;
 import lombok.RequiredArgsConstructor;
+import net.eltown.economy.components.math.SortPlayer;
 import net.eltown.economy.components.provider.Provider;
 import net.eltown.economy.Economy;
 
@@ -103,11 +104,7 @@ public class API {
     }
 
     public void getAll(Consumer<Map<String, Double>> callback) {
-        CompletableFuture.runAsync(() -> callback.accept(this.provider.getAll()));
-    }
-
-    public Map<String, Double> getAll() {
-        return this.provider.getAll();
+        CompletableFuture.runAsync(() -> this.provider.getAll(callback));
     }
 
     public String getMonetaryUnit() {
