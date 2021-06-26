@@ -1,4 +1,4 @@
-package net.eltown.economy.commands;
+package net.eltown.economy.commands.economy;
 
 import cn.nukkit.Player;
 import cn.nukkit.command.CommandSender;
@@ -6,7 +6,7 @@ import cn.nukkit.command.PluginCommand;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.utils.ConfigSection;
-import net.eltown.economy.components.language.Language;
+import net.eltown.economy.components.economy.language.Language;
 import net.eltown.economy.Economy;
 
 import java.util.concurrent.CompletableFuture;

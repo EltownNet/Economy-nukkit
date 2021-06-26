@@ -1,4 +1,4 @@
-package net.eltown.economy.components.math;
+package net.eltown.economy.components.economy.math;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

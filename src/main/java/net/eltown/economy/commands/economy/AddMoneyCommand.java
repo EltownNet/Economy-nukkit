@@ -1,4 +1,4 @@
-package net.eltown.economy.commands;
+package net.eltown.economy.commands.economy;
 
 import cn.nukkit.Player;
 import cn.nukkit.command.CommandSender;
@@ -7,13 +7,13 @@ import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.utils.ConfigSection;
 import net.eltown.economy.Economy;
-import net.eltown.economy.components.language.Language;
+import net.eltown.economy.components.economy.language.Language;
 
 import java.util.concurrent.CompletableFuture;
 
-public class ReduceMoneyCommand extends PluginCommand<Economy> {
+public class AddMoneyCommand extends PluginCommand<Economy> {
 
-    public ReduceMoneyCommand(Economy owner, ConfigSection section) {
+    public AddMoneyCommand(Economy owner, ConfigSection section) {
         super(section.getString("Name"), owner);
         setDescription(section.getString("Description"));
         setUsage(section.getString("Usage"));
@@ -31,14 +31,13 @@ public class ReduceMoneyCommand extends PluginCommand<Economy> {
         if (!sender.hasPermission(getPermission())) return false;
         CompletableFuture.runAsync(() -> {
             if (args.length >= 2) {
+                try {
+                    String target = args[0];
+                    Player playerTarget = getPlugin().getServer().getPlayer(target);
+                    if (playerTarget != null) target = playerTarget.getName();
 
-                String target = args[0];
-                Player playerTarget = getPlugin().getServer().getPlayer(target);
-                if (playerTarget != null) target = playerTarget.getName();
-
-                String finalTarget = target;
-                Economy.getAPI().hasAccount(target, (has) -> {
-                    try {
+                    String finalTarget = target;
+                    Economy.getAPI().hasAccount(target, (has) -> {
                         if (!has) {
                             sender.sendMessage(Language.get("not-registered", finalTarget));
                             return;
@@ -51,16 +50,14 @@ public class ReduceMoneyCommand extends PluginCommand<Economy> {
                             return;
                         }
 
-                        Economy.getAPI().reduceMoney(finalTarget, amt);
-                        sender.sendMessage(Language.get("reduced-money", finalTarget, getPlugin().getMonetaryUnit(), this.getPlugin().getMoneyFormat().format(amt)));
-                    } catch (NumberFormatException ex) {
-                        sender.sendMessage(Language.get("invalid-amount"));
-                    }
-                });
-
+                        Economy.getAPI().addMoney(finalTarget, amt);
+                        sender.sendMessage(Language.get("added-money", finalTarget, getPlugin().getMonetaryUnit(), this.getPlugin().getMoneyFormat().format(amt)));
+                    });
+                } catch (NumberFormatException ex) {
+                    sender.sendMessage(Language.get("invalid-amount"));
+                }
             } else sender.sendMessage(Language.get("usage", getUsage()));
         });
         return false;
     }
-
 }

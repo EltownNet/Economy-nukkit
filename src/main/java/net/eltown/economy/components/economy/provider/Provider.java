@@ -1,8 +1,8 @@
-package net.eltown.economy.components.provider;
+package net.eltown.economy.components.economy.provider;
 
 import lombok.RequiredArgsConstructor;
 import net.eltown.economy.Economy;
-import net.eltown.economy.components.data.CallData;
+import net.eltown.economy.components.economy.data.CallData;
 
 import java.util.Arrays;
 import java.util.HashMap;

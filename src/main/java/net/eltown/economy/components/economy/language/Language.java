@@ -1,4 +1,4 @@
-package net.eltown.economy.components.language;
+package net.eltown.economy.components.economy.language;
 
 import cn.nukkit.utils.Config;
 import net.eltown.economy.Economy;

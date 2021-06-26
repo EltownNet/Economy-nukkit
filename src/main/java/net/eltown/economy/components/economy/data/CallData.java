@@ -1,4 +1,4 @@
-package net.eltown.economy.components.data;
+package net.eltown.economy.components.economy.data;
 
 public enum CallData {
 

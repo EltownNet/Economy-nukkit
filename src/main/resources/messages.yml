@@ -1,45 +1,54 @@
-prefix: "§8» §eLlamaEconomy §8| §7"
+prefix: "§8» §fWirtschaft §8| §7"
+
+# Crypto
+invalid.amount: "§cUngültiger Betrag."
+not.enough.crpyto: "§cDu hast nicht genügend [0]."
+crypto.sold: "§7Du hast soeben §a[0] [1]§7 für §a[2][3]§7 verkauft."
+crypto.bought: "§7Du hast soeben §a[0] [1]§7 für §a[2][3]§7 gekauft."
+crypto.sent: "§7Du hast soeben §a[0] [1]§7 an §a[2] §7überwiesen."
+
+# Economy
 
 # --- General Errors ---
-usage: "§cUsage: §r[0]"
-invalid-amount: "§cPlease provide a valid amount."
+usage: "§cBenutze: §r[0]"
+invalid-amount: "§cBitte gebe einen gültigen Betrag an."
 # [0] = playername
-not-registered: "§cThere is no player registered with the name [0]."
+not-registered: "§cDer Spieler [0] konnte nicht gefunden werden."
 
 # --- Commands ---
 # /money
 # [0] = monetary unit, [1] = amount
-money: "§aYou currently have [0][1]."
+money: "§7Du hast zurzeit §a[0][1]§7."
 # [0] = name of player, [1] = monetary unit, [2] = amount
-money-other: "§a[0] currently has [1][2]."
+money-other: "§a[0]§7 hat zurzeit §a[1][2]§7."
 
 # /setmoney
 # [0] = name of player, [1] = monetary unit, [2] = amount
-set-money: "§aSet money of [0] to [1][2]."
+set-money: "§aSet money of [0] to [2][1]."
 
 # /addmoney
 # [0] = name of player, [1] = monetary unit, [2] = amount
-added-money: "§aYou added [1][2] to [0]."
+added-money: "§7Du hast soeben §a[0] §a[2][1]§7 gegeben."
 
 # /reducemoney
 # [0] = name of player, [1] = monetary unit, [2] = amount
-reduced-money: "§aYou reduced the money of [0] by [1][2]."
+reduced-money: "§7Du hast soeben §a[0] [2][1]§7 abgezogen."
 
 # /pay
-pay-not-enough-money: "§cYou don't have enough money."
+pay-not-enough-money: "§cDu hast nicht genügend Geld."
 # [0] = name of player, [1] = monetary unit, [2] = amount
-you-paid: "§aYou paid [0] [1][2]"
+you-paid: "§7Du hast soeben §a[2][1]§7 an §a[0]§7 überwiesen."
 # [0] = name of player, [1] = monetary unit, [2] = amount
-paid-you: "[0] paid you [1][2]"
+paid-you: "§a[0]§7 hat dir soeben §a[2][1] §7überwiesen."
 
 # /topmoney
-topmoney-invalid: "§cPlease provide a valid page number."
+topmoney-invalid: "§cBitte gebe eine gültige Seitennummer an."
 topmoney-header: "§e--- Richest Players ---"
 # [0] = position, [1] = playername, [2] = monetary unit, [3] = money
-topmoney-player: "§a[0]. [1] §6[2][3]"
+topmoney-player: "§a[0]. [1] §6[3][2]"
 topmoney-siteinfo: "§aPage §a[§6[0]§a/§6[1]§a]"
 topmoney-footer: "§e--- Richest Players ---"
 
 # /lecoreload
-reload: "§eReloading LlamaEconomy..."
-reloaded: "§aDone!"
+reload: "§7Lade Economy neu..."
+reloaded: "§aFertig."

@@ -1,9 +1,8 @@
-package net.eltown.economy.components.api;
+package net.eltown.economy.components.economy.api;
 
 import cn.nukkit.Player;
 import lombok.RequiredArgsConstructor;
-import net.eltown.economy.components.math.SortPlayer;
-import net.eltown.economy.components.provider.Provider;
+import net.eltown.economy.components.economy.provider.Provider;
 import net.eltown.economy.Economy;
 
 import java.text.DecimalFormat;

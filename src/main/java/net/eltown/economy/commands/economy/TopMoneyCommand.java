@@ -1,17 +1,16 @@
-package net.eltown.economy.commands;
+package net.eltown.economy.commands.economy;
 
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.PluginCommand;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.utils.ConfigSection;
-import net.eltown.economy.components.math.SortPlayer;
+import net.eltown.economy.components.economy.math.SortPlayer;
 import net.eltown.economy.Economy;
-import net.eltown.economy.components.language.Language;
+import net.eltown.economy.components.economy.language.Language;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 
 public class TopMoneyCommand extends PluginCommand<Economy> {

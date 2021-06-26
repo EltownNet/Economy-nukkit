@@ -5,10 +5,13 @@ import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.Config;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import net.eltown.economy.commands.*;
-import net.eltown.economy.components.api.API;
-import net.eltown.economy.components.language.Language;
-import net.eltown.economy.components.provider.Provider;
+import net.eltown.economy.commands.crypto.WalletCommand;
+import net.eltown.economy.commands.economy.*;
+import net.eltown.economy.components.crypto.api.CryptoAPI;
+import net.eltown.economy.components.economy.api.API;
+import net.eltown.economy.components.economy.language.Language;
+import net.eltown.economy.components.economy.provider.Provider;
+import net.eltown.economy.components.forms.FormListener;
 import net.eltown.economy.components.tinyrabbit.TinyRabbit;
 import net.eltown.economy.listener.PlayerListener;
 
@@ -17,7 +20,10 @@ import java.text.DecimalFormat;
 public class Economy extends PluginBase {
 
     @Getter
-    private static net.eltown.economy.components.api.API API;
+    private static net.eltown.economy.components.economy.api.API API;
+
+    @Getter
+    private static CryptoAPI cryptoAPI;
 
     @Getter
     private double defaultMoney;
@@ -25,6 +31,8 @@ public class Economy extends PluginBase {
     private String monetaryUnit;
     @Getter
     private DecimalFormat moneyFormat;
+    @Getter
+    private DecimalFormat cryptoFormat;
     @Getter
     private TinyRabbit rabbit;
 
@@ -35,6 +43,8 @@ public class Economy extends PluginBase {
     public void onLoad() {
         this.moneyFormat = new DecimalFormat();
         this.moneyFormat.setMaximumFractionDigits(2);
+        this.cryptoFormat = new DecimalFormat();
+        this.cryptoFormat.setMaximumFractionDigits(4); // 0.0001
         this.rabbit = new TinyRabbit("localhost", "Economy/Server");
     }
 
@@ -53,7 +63,10 @@ public class Economy extends PluginBase {
         this.provider = new Provider(this);
         API = new API(this, provider);
 
+        cryptoAPI = new CryptoAPI(this);
+
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+        this.getServer().getPluginManager().registerEvents(new FormListener(), this);
         this.registerCommands(config);
 
         this.getLogger().info("§aDone.");
@@ -69,6 +82,7 @@ public class Economy extends PluginBase {
         cmd.register("pay", new PayCommand(this, config.getSection("Commands.Pay")));
         cmd.register("topmoney", new TopMoneyCommand(this, config.getSection("Commands.Topmoney")));
         cmd.register("lecoreload", new LecoReloadCommand(this, config.getSection("Commands.Lecoreload")));
+        cmd.register("wallet", new WalletCommand(this));
     }
 
     @Override
