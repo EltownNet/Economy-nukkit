@@ -6,6 +6,7 @@ not.enough.crpyto: "§cDu hast nicht genügend [0]."
 crypto.sold: "§7Du hast soeben §a[0] [1]§7 für §a[2][3]§7 verkauft."
 crypto.bought: "§7Du hast soeben §a[0] [1]§7 für §a[2][3]§7 gekauft."
 crypto.sent: "§7Du hast soeben §a[0] [1]§7 an §a[2] §7überwiesen."
+crypto.get: "§a[0] §7hat dir soeben §a[1] [2] §7überwiesen. Siehe mit §a/wallet §7bei deinen Transaktionen nach, um den derzeitigen Status der Transaktion einzusehen."
 
 # Economy
 

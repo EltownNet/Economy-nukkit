@@ -31,6 +31,72 @@ public class CryptoAPI {
         }, "crypto.callback", CryptoCalls.REQUEST_WALLET.name(), player);
     }
 
+    public void addCrypto(final String player, final CryptoType type, final double amount) {
+        CompletableFuture.runAsync(() -> {
+            this.getWallet((wallet) -> {
+                switch (type) {
+                    case CTC:
+                        this.plugin.getRabbit().send("crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
+                                player,
+                                "" + (wallet.getCtc() + amount),
+                                "" + wallet.getElt(),
+                                "" + wallet.getNot()
+                        );
+                        break;
+                    case ELT:
+                        this.plugin.getRabbit().send("crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
+                                player,
+                                "" + wallet.getCtc(),
+                                "" + (wallet.getElt() + amount),
+                                "" + wallet.getNot()
+                        );
+                        break;
+                    case NOT:
+                        this.plugin.getRabbit().send("crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
+                                player,
+                                "" + wallet.getCtc(),
+                                "" + wallet.getElt(),
+                                "" + (wallet.getNot() + amount)
+                        );
+                        break;
+                }
+            }, player);
+        });
+    }
+
+    public void reduceCrypto(final String player, final CryptoType type, final double amount) {
+        CompletableFuture.runAsync(() -> {
+            this.getWallet((wallet) -> {
+                switch (type) {
+                    case CTC:
+                        this.plugin.getRabbit().send("crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
+                                player,
+                                "" + (wallet.getCtc() - amount),
+                                "" + wallet.getElt(),
+                                "" + wallet.getNot()
+                        );
+                        break;
+                    case ELT:
+                        this.plugin.getRabbit().send("crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
+                                player,
+                                "" + wallet.getCtc(),
+                                "" + (wallet.getElt() - amount),
+                                "" + wallet.getNot()
+                        );
+                        break;
+                    case NOT:
+                        this.plugin.getRabbit().send("crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
+                                player,
+                                "" + wallet.getCtc(),
+                                "" + wallet.getElt(),
+                                "" + (wallet.getNot() - amount)
+                        );
+                        break;
+                }
+            }, player);
+        });
+    }
+
     public void getTransactions(final String player, final Consumer<Set<Transaction>> callback) {
         CompletableFuture.runAsync(() -> {
             this.plugin.getRabbit().sendAndReceive((delivery) -> {
@@ -96,84 +162,29 @@ public class CryptoAPI {
     public void createTransfer(final double price, final double amount, final double worth, final CryptoType type, final Player from, final String to, final int time) {
         this.sellCrypto(from, type, amount + price, 0);
 
-        Server.getInstance().getScheduler().scheduleDelayedTask(() -> {
-            this.plugin.getRabbit().send("crypto.receive", CryptoCalls.UPDATE_TRANSFER_CRYPTO.name(),
-                    type.name(),
-                    "" + amount,
-                    "" +  (amount * worth),
-                    "" + from.getName(),
-                    "" + to,
-                    "" + time
-            );
-        }, 20);
-
+        this.plugin.getRabbit().send("crypto.receive", CryptoCalls.UPDATE_TRANSFER_CRYPTO.name(),
+                type.name(),
+                "" + amount,
+                "" + (amount * worth),
+                "" + from.getName(),
+                "" + to,
+                "" + time
+        );
     }
 
+    @Deprecated /* Nicht verwenden! */
     public void buyCrypto(final Player player, final CryptoType type, final double amount, final double price) {
         CompletableFuture.runAsync(() -> {
             Economy.getAPI().reduceMoney(player, price);
-            this.getWallet((wallet) -> {
-                switch (type) {
-                    case CTC:
-                        this.plugin.getRabbit().send("crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
-                                player.getName(),
-                                "" + (wallet.getCtc() + amount),
-                                "" + wallet.getElt(),
-                                "" + wallet.getNot()
-                        );
-                        break;
-                    case ELT:
-                        this.plugin.getRabbit().send("crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
-                                player.getName(),
-                                "" + wallet.getCtc(),
-                                "" + (wallet.getElt() + amount),
-                                "" + wallet.getNot()
-                        );
-                        break;
-                    case NOT:
-                        this.plugin.getRabbit().send("crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
-                                player.getName(),
-                                "" + wallet.getCtc(),
-                                "" + wallet.getElt(),
-                                "" + (wallet.getNot() + amount)
-                        );
-                        break;
-                }
-            }, player.getName());
+            this.addCrypto(player.getName(), type, amount);
         });
     }
 
+    @Deprecated /* Nicht verwenden! */
     public void sellCrypto(final Player player, final CryptoType type, final double amount, final double earn) {
         CompletableFuture.runAsync(() -> {
             Economy.getAPI().addMoney(player, earn);
-            this.getWallet((wallet) -> {
-                switch (type) {
-                    case CTC:
-                        this.plugin.getRabbit().send("crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
-                                player.getName(),
-                                "" + (wallet.getCtc() - amount),
-                                "" + wallet.getElt(),
-                                "" + wallet.getNot()
-                        );
-                        break;
-                    case ELT:
-                        this.plugin.getRabbit().send("crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
-                                player.getName(),
-                                "" + wallet.getCtc(),
-                                "" + (wallet.getElt() - amount),
-                                "" + wallet.getNot()
-                        );
-                        break;
-                    case NOT:
-                        this.plugin.getRabbit().send("crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
-                                player.getName(),
-                                "" + wallet.getCtc(),
-                                "" + wallet.getElt(),
-                                "" + (wallet.getNot() - amount)
-                        );
-                        break;
-                }
-            }, player.getName());
+            this.reduceCrypto(player.getName(), type, amount);
         });
     }
 

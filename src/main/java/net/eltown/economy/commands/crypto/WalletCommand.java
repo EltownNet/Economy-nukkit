@@ -1,6 +1,7 @@
 package net.eltown.economy.commands.crypto;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.PluginCommand;
 import cn.nukkit.form.element.ElementButton;
@@ -54,12 +55,12 @@ public class WalletCommand extends PluginCommand<Economy> {
             transactions.forEach((t) -> {
                 builder.addButton(new ElementButton(
                         (!t.isCompleted() ? "§e#§f " : t.getFrom().equalsIgnoreCase(player.getName()) ? "§c-§f " : "§a+§f ")
-                                + t.getAmount() + " " + t.getType() + "\n§7" + t.getId()
+                                + formatBalance(t.getAmount()) + " " + t.getType() + "\n§7" + t.getId()
                 ), (p) -> {
                     new SimpleForm.Builder(t.getId(),
                             "Status: " + (t.isCompleted() ? "§eIn Bearbeitung" : "§aAbgeschlossen")
-                                    + "Menge: " + (t.getFrom().equalsIgnoreCase(player.getName()) ? "§c- §r" : "§a+ §r") + formatBalance(t.getAmount()) + t.getType()
-                                    + (t.getFrom().equalsIgnoreCase(player.getName()) ? "An: " + t.getTo() : "Von: " + t.getFrom())
+                                    + "\n§rMenge: " + (t.getFrom().equalsIgnoreCase(player.getName()) ? "§c-" : "§a+") + formatBalance(t.getAmount()) + " " + t.getType()
+                                    + "\n§r"+ (t.getFrom().equalsIgnoreCase(player.getName()) ? "An: " + t.getTo() : "Von: " + t.getFrom())
                     ).addButton(new ElementButton("§8» §4Zurück"), this::openTransactions)
                             .build().send(player);
                 });
@@ -110,21 +111,31 @@ public class WalletCommand extends PluginCommand<Economy> {
 
     private void transferCrypto(final Player player, final CryptoType type, final double worth, final double balance, final double cost, final int time) {
         new CustomForm.Builder("§8» §f" + type.name() + " Überweisen")
-                .addElement(new ElementLabel("Gebe an, wie viel " + type.name() + " und an wen du diese überweisen möchtest.\nDu hast zurzeit §a" + (balance - cost) + "* " + type.name() + "§f.\n\n" + "*= §c-§r" + cost + " " + type.name() + " Transfergebühren."))
+                .addElement(new ElementLabel("Gebe an, wie viel " + type.name() + " und an wen du diese überweisen möchtest.\nDu hast zurzeit §a" + formatBalance(balance - cost) + " " + type.name() + "§e*§r.\n\n" + "§e*§r §c-" + formatBalance(cost) + " " + type.name() + " §rTransfergebühren."))
                 .addElement(new ElementInput("Empfänger", "Steve"))
-                .addElement(new ElementInput("Betrag (Min. 0.0001; Max. " + formatBalance(balance - cost) + ")", formatBalance(balance / 2) + type.name()))
+                .addElement(new ElementInput("Betrag (Min. 0.0001; Max. " + formatBalance(balance - cost) + ")", formatBalance(balance / 2)))
                 .onSubmit((p, f) -> {
                     try {
-                        final String user = f.getInputResponse(1);
-                        final double amount = Double.parseDouble(f.getInputResponse(2));
+                        String preUser = f.getInputResponse(1);
+
+                        final Player preTarget = Server.getInstance().getPlayer(preUser);
+                        if (preTarget != null) preUser = preTarget.getName();
+
+                        final String user = preUser;
+
+                        final double amount = Double.parseDouble(f.getInputResponse(2).replace(",", "."));
 
                         Economy.getAPI().hasAccount(user, (has) -> {
                             if (has) {
-                                if ((amount + cost) < balance && amount >= 0.0001) {
-                                    new ModalForm.Builder("§8» §f" + type.name() + " Überweisen", "Möchtest du wirklich §a" + amount + " " + type.name() + "§r an §a" + user + "§r überweisen?\n\nDies entspricht zurzeit §a" + (worth * amount) + "$§r. Es kostet dich insgesamt §a" + (amount + cost) + " " + type.name() + " (Betrag + Gebühren)§r.", "§8» §fJa", "§8» §fNein")
+                                if ((amount + cost) <= balance && amount >= 0.0001) {
+                                    new ModalForm.Builder("§8» §f" + type.name() + " Überweisen", "Möchtest du wirklich §a" + formatBalance(amount) + " " + type.name() + "§r an §a" + user + "§r überweisen?\n\nDies entspricht zurzeit §a" + Economy.getAPI().getMoneyFormat().format(worth * amount) + "$§r. Es kostet dich insgesamt §a" + formatBalance(amount + cost) + " " + type.name() + " (Betrag + Gebühren)§r.", "§8» §fJa", "§8» §fNein")
                                             .onYes((pp) -> {
                                                 Economy.getCryptoAPI().createTransfer(cost, amount, worth, type, pp, user, time);
-                                                p.sendMessage(Language.get("crypto.sent", amount, type, user));
+                                                p.sendMessage(Language.get("crypto.sent", formatBalance(amount), type, user));
+
+                                                if (preTarget != null) {
+                                                    preTarget.sendMessage(Language.get("crypto.get", pp.getName(), formatBalance(amount), type.name()));
+                                                }
                                             })
                                             .onNo((pp) -> {
 
@@ -143,10 +154,10 @@ public class WalletCommand extends PluginCommand<Economy> {
     private void sellCrypto(final Player player, final CryptoType type, final double worth, final double balance) {
         new CustomForm.Builder(("§8» §f" + type.name() + " Verkaufen"))
                 .addElement(new ElementLabel("Wie viel " + type.name() + " möchtest du verkaufen?"))
-                .addElement(new ElementInput("Betrag (Min. 0.0001; Max. " + formatBalance(balance) + ")", "0.0001", "0.0001"))
+                .addElement(new ElementInput("Betrag (Min. 0,0001; Max. " + formatBalance(balance) + ")", "0,0001", "0,0001"))
                 .onSubmit((p, f) -> {
                     try {
-                        final double amount = Double.parseDouble(f.getInputResponse(1));
+                        final double amount = Double.parseDouble(f.getInputResponse(1).replace(",", "."));
 
                         if (amount >= 0.0001) {
                             if (amount <= balance) {
@@ -175,10 +186,10 @@ public class WalletCommand extends PluginCommand<Economy> {
     private void buyCrypto(final Player player, final CryptoType type, final double worth) {
         new CustomForm.Builder(("§8» §f" + type.name() + " Kaufen"))
                 .addElement(new ElementLabel("Wie viel " + type.name() + " möchtest du kaufen?"))
-                .addElement(new ElementInput("Betrag (Min. 0.0001)", "0.0001", "0.0001"))
+                .addElement(new ElementInput("Betrag (Min. 0,0001)", "0,0001", "0,0001"))
                 .onSubmit((p, f) -> {
                     try {
-                        final double amount = Double.parseDouble(f.getInputResponse(1));
+                        final double amount = Double.parseDouble(f.getInputResponse(1).replace(",", "."));
 
                         if (amount >= 0.0001) {
 

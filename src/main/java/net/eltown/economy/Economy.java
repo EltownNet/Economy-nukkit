@@ -41,29 +41,30 @@ public class Economy extends PluginBase {
     @SneakyThrows
     @Override
     public void onLoad() {
+        this.saveDefaultConfig();
+
+        Language.init(this);
+
         this.moneyFormat = new DecimalFormat();
         this.moneyFormat.setMaximumFractionDigits(2);
         this.cryptoFormat = new DecimalFormat();
         this.cryptoFormat.setMaximumFractionDigits(4); // 0.0001
         this.rabbit = new TinyRabbit("localhost", "Economy/Server");
-    }
-
-    @Override
-    public void onEnable() {
-        this.saveDefaultConfig();
-        final Config config = this.getConfig();
-
-        Language.init(this);
-
-        this.getLogger().info("§aStarting Economy...");
-
-        this.defaultMoney = config.getDouble("DefaultMoney");
-        this.monetaryUnit = config.getString("MonetaryUnit");
 
         this.provider = new Provider(this);
         API = new API(this, provider);
 
         cryptoAPI = new CryptoAPI(this);
+    }
+
+    @Override
+    public void onEnable() {
+        final Config config = this.getConfig();
+
+        this.getLogger().info("§aStarting Economy...");
+
+        this.defaultMoney = config.getDouble("DefaultMoney");
+        this.monetaryUnit = config.getString("MonetaryUnit");
 
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         this.getServer().getPluginManager().registerEvents(new FormListener(), this);
