@@ -54,7 +54,7 @@ public class WalletCommand extends PluginCommand<Economy> {
 
             transactions.forEach((t) -> {
                 builder.addButton(new ElementButton(
-                        (!t.isCompleted() ? "§e#§f " : t.getFrom().equalsIgnoreCase(player.getName()) ? "§c-§f" : "§a+§f")
+                        (!t.isCompleted() ? "§e#§f " : t.getFrom().equalsIgnoreCase(player.getName()) ? "§c-" : "§a+")
                                 + formatBalance(t.getAmount()) + " " + t.getType() + "\n§7" + t.getId()
                 ), (p) -> {
                     new SimpleForm.Builder(t.getId(),
