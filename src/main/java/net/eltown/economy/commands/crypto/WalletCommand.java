@@ -54,11 +54,11 @@ public class WalletCommand extends PluginCommand<Economy> {
 
             transactions.forEach((t) -> {
                 builder.addButton(new ElementButton(
-                        (!t.isCompleted() ? "§e#§f " : t.getFrom().equalsIgnoreCase(player.getName()) ? "§c-§f " : "§a+§f ")
+                        (!t.isCompleted() ? "§e#§f " : t.getFrom().equalsIgnoreCase(player.getName()) ? "§c-§f" : "§a+§f")
                                 + formatBalance(t.getAmount()) + " " + t.getType() + "\n§7" + t.getId()
                 ), (p) -> {
                     new SimpleForm.Builder(t.getId(),
-                            "Status: " + (t.isCompleted() ? "§eIn Bearbeitung" : "§aAbgeschlossen")
+                            "Status: " + (t.isCompleted() ? "§aAbgeschlossen" : "§eIn Bearbeitung")
                                     + "\n§rMenge: " + (t.getFrom().equalsIgnoreCase(player.getName()) ? "§c-" : "§a+") + formatBalance(t.getAmount()) + " " + t.getType()
                                     + "\n§r"+ (t.getFrom().equalsIgnoreCase(player.getName()) ? "An: " + t.getTo() : "Von: " + t.getFrom())
                     ).addButton(new ElementButton("§8» §4Zurück"), this::openTransactions)
