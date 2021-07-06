@@ -7,13 +7,16 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import net.eltown.economy.commands.crypto.WalletCommand;
 import net.eltown.economy.commands.economy.*;
+import net.eltown.economy.commands.shops.SetShopPriceCommand;
 import net.eltown.economy.components.crypto.api.CryptoAPI;
 import net.eltown.economy.components.economy.api.API;
 import net.eltown.economy.components.economy.language.Language;
 import net.eltown.economy.components.economy.provider.Provider;
 import net.eltown.economy.components.forms.FormListener;
+import net.eltown.economy.components.shops.api.ShopAPI;
 import net.eltown.economy.components.tinyrabbit.TinyRabbit;
 import net.eltown.economy.listener.PlayerListener;
+import net.eltown.economy.listener.ShopListener;
 
 import java.text.DecimalFormat;
 
@@ -24,6 +27,7 @@ public class Economy extends PluginBase {
 
     @Getter
     private static CryptoAPI cryptoAPI;
+    private ShopAPI shopAPI;
 
     @Getter
     private double defaultMoney;
@@ -55,6 +59,7 @@ public class Economy extends PluginBase {
         API = new API(this, provider);
 
         cryptoAPI = new CryptoAPI(this);
+        this.shopAPI = new ShopAPI(this);
     }
 
     @Override
@@ -67,6 +72,7 @@ public class Economy extends PluginBase {
         this.monetaryUnit = config.getString("MonetaryUnit");
 
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+        this.getServer().getPluginManager().registerEvents(new ShopListener(this), this);
         this.getServer().getPluginManager().registerEvents(new FormListener(), this);
         this.registerCommands(config);
 
@@ -76,14 +82,15 @@ public class Economy extends PluginBase {
     public void registerCommands(Config config) {
         CommandMap cmd = getServer().getCommandMap();
 
-        cmd.register("money", new MoneyCommand(this, config.getSection("Commands.Money")));
-        cmd.register("setmoney", new SetMoneyCommand(this, config.getSection("Commands.Setmoney")));
-        cmd.register("addmoney", new AddMoneyCommand(this, config.getSection("Commands.Addmoney")));
-        cmd.register("reducemoney", new ReduceMoneyCommand(this, config.getSection("Commands.Reducemoney")));
-        cmd.register("pay", new PayCommand(this, config.getSection("Commands.Pay")));
-        cmd.register("topmoney", new TopMoneyCommand(this, config.getSection("Commands.Topmoney")));
-        cmd.register("lecoreload", new LecoReloadCommand(this, config.getSection("Commands.Lecoreload")));
-        cmd.register("wallet", new WalletCommand(this));
+        cmd.register("economy", new MoneyCommand(this, config.getSection("Commands.Money")));
+        cmd.register("economy", new SetMoneyCommand(this, config.getSection("Commands.Setmoney")));
+        cmd.register("economy", new AddMoneyCommand(this, config.getSection("Commands.Addmoney")));
+        cmd.register("economy", new ReduceMoneyCommand(this, config.getSection("Commands.Reducemoney")));
+        cmd.register("economy", new PayCommand(this, config.getSection("Commands.Pay")));
+        cmd.register("economy", new TopMoneyCommand(this, config.getSection("Commands.Topmoney")));
+        cmd.register("economy", new LecoReloadCommand(this, config.getSection("Commands.Lecoreload")));
+        cmd.register("economy", new WalletCommand(this));
+        cmd.register("economy", new SetShopPriceCommand(this));
     }
 
     @Override

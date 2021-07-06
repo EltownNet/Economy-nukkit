@@ -53,3 +53,8 @@ topmoney-footer: "§e--- Richest Players ---"
 # /lecoreload
 reload: "§7Lade Economy neu..."
 reloaded: "§aFertig."
+
+# shop forms
+item.bought: "&7Du hast &a[0]x &7das Item &a[1] &7für &a$[2] &7gekauft."
+item.not.enough.money: "&7Du hast zu wenig Geld, um dir dieses Item kaufen zu können."
+item.inventory.full: "&7Bitte schaffe in deinem Inventar platz, damit du dieses Item kaufen kannst."
