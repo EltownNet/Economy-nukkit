@@ -28,37 +28,43 @@ public class ShopForms {
         final CustomForm customForm = new CustomForm.Builder("§7» §8" + Item.get(id[0], id[1]).getName())
                 .addElement(new ElementInput("Bitte gebe an, wie viel du von diesem Item kaufen möchtest.", "64", "64"))
                 .onSubmit((g, h) -> {
-                    int i = Integer.parseInt(h.getInputResponse(0));
+                    try {
+                        int i = Integer.parseInt(h.getInputResponse(0));
+                        if (i <= 0) throw new Exception("Invalid item amount");
 
-                    this.shopAPI.getCurrentPrice(id, i, finalPrice -> {
-                        final ModalForm modalForm = new ModalForm.Builder("§7» §8Kaufbestätigung", "Möchtest du §a" + i + "x " + Item.get(id[0], id[1]).getName() + " §ffür"
-                                + " §a$" + Economy.getAPI().getMoneyFormat().format(finalPrice) + " §fkaufen?", "§7» §aKaufen", "§7» §cAbbrechen")
-                                .onYes(l -> {
-                                    if (!player.getInventory().canAddItem(Item.get(id[0], id[1], i))) {
-                                        player.sendMessage(Language.get("item.inventory.full"));
-                                        this.playSound(player, Sound.NOTE_BASS);
-                                        return;
-                                    }
-
-                                    Economy.getAPI().getMoney(player, money -> {
-                                        if (money >= finalPrice) {
-                                            Economy.getAPI().reduceMoney(player, finalPrice);
-                                            this.shopAPI.sendBought(id, i);
-                                            player.getInventory().addItem(Item.get(id[0], id[1], i));
-                                            player.sendMessage(Language.get("item.bought", i, Item.get(id[0], id[1], i).getName(), Economy.getAPI().getMoneyFormat().format(finalPrice)));
-                                            this.playSound(player, Sound.RANDOM_LEVELUP);
-                                        } else {
-                                            player.sendMessage(Language.get("item.not.enough.money"));
+                        this.shopAPI.getCurrentPrice(id, i, finalPrice -> {
+                            final ModalForm modalForm = new ModalForm.Builder("§7» §8Kaufbestätigung", "Möchtest du §a" + i + "x " + Item.get(id[0], id[1]).getName() + " §ffür"
+                                    + " §a$" + Economy.getAPI().getMoneyFormat().format(finalPrice) + " §fkaufen?", "§7» §aKaufen", "§7» §cAbbrechen")
+                                    .onYes(l -> {
+                                        if (!player.getInventory().canAddItem(Item.get(id[0], id[1], i))) {
+                                            player.sendMessage(Language.get("item.inventory.full"));
                                             this.playSound(player, Sound.NOTE_BASS);
+                                            return;
                                         }
-                                    });
-                                })
-                                .onNo(l -> {
-                                    this.playSound(player, Sound.NOTE_BASS);
-                                })
-                                .build();
-                        modalForm.send(player);
-                    });
+
+                                        Economy.getAPI().getMoney(player, money -> {
+                                            if (money >= finalPrice) {
+                                                Economy.getAPI().reduceMoney(player, finalPrice);
+                                                this.shopAPI.sendBought(id, i);
+                                                player.getInventory().addItem(Item.get(id[0], id[1], i));
+                                                player.sendMessage(Language.get("item.bought", i, Item.get(id[0], id[1], i).getName(), Economy.getAPI().getMoneyFormat().format(finalPrice)));
+                                                this.playSound(player, Sound.RANDOM_LEVELUP);
+                                            } else {
+                                                player.sendMessage(Language.get("item.not.enough.money"));
+                                                this.playSound(player, Sound.NOTE_BASS);
+                                            }
+                                        });
+                                    })
+                                    .onNo(l -> {
+                                        this.playSound(player, Sound.NOTE_BASS);
+                                    })
+                                    .build();
+                            modalForm.send(player);
+                        });
+                    } catch (final Exception e) {
+                        player.sendMessage(Language.get("item.invalid.amount"));
+                        this.playSound(player, Sound.NOTE_BASS);
+                    }
                 })
                 .build();
         customForm.send(player);
