@@ -16,28 +16,23 @@ import net.eltown.economy.components.forms.FormListener;
 import net.eltown.economy.components.shops.api.ShopAPI;
 import net.eltown.economy.components.tinyrabbit.TinyRabbit;
 import net.eltown.economy.listener.PlayerListener;
-import net.eltown.economy.listener.ShopListener;
 
 import java.text.DecimalFormat;
 
+@Getter
 public class Economy extends PluginBase {
 
     @Getter
     private static net.eltown.economy.components.economy.api.API API;
-
     @Getter
     private static CryptoAPI cryptoAPI;
-    private ShopAPI shopAPI;
+    @Getter
+    private static ShopAPI shopAPI;
 
-    @Getter
     private double defaultMoney;
-    @Getter
     private String monetaryUnit;
-    @Getter
     private DecimalFormat moneyFormat;
-    @Getter
     private DecimalFormat cryptoFormat;
-    @Getter
     private TinyRabbit rabbit;
 
     private Provider provider;
@@ -59,7 +54,7 @@ public class Economy extends PluginBase {
         API = new API(this, provider);
 
         cryptoAPI = new CryptoAPI(this);
-        this.shopAPI = new ShopAPI(this);
+        shopAPI = new ShopAPI(this);
     }
 
     @Override
@@ -72,7 +67,6 @@ public class Economy extends PluginBase {
         this.monetaryUnit = config.getString("MonetaryUnit");
 
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
-        this.getServer().getPluginManager().registerEvents(new ShopListener(this), this);
         this.getServer().getPluginManager().registerEvents(new FormListener(), this);
         this.registerCommands(config);
 

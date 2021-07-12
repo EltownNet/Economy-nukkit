@@ -20,7 +20,7 @@ public class SetShopPriceCommand extends PluginCommand<Economy> {
                 final int subId = Integer.parseInt(args[1]);
                 final double price = Double.parseDouble(args[2]);
 
-                this.getPlugin().getShopAPI().setPrice(new int[]{id, subId}, price);
+                Economy.getShopAPI().setPrice(new int[]{id, subId}, price);
                 sender.sendMessage("Der Preis für das Item " + id + ":" + subId + " wurde auf $" + price + " gesetzt.");
             } catch (final Exception e) {
                 sender.sendMessage("Fehlerhafte Angaben.");

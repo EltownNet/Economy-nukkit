@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import net.eltown.economy.Economy;
 import net.eltown.economy.components.shops.data.ShopCalls;
-import net.eltown.economy.components.shops.forms.ShopForms;
 import net.eltown.economy.components.tinyrabbit.TinyRabbit;
 
 import java.util.function.Consumer;
@@ -13,13 +12,11 @@ import java.util.function.Consumer;
 public class ShopAPI {
 
     private final Economy economy;
-    private final ShopForms shopForms;
     private final TinyRabbit rabbit;
 
     @SneakyThrows
     public ShopAPI(final Economy economy) {
         this.economy = economy;
-        this.shopForms = new ShopForms(this);
         this.rabbit = new TinyRabbit("localhost", "Server/Shops");
         this.rabbit.throwExceptions(true);
     }
