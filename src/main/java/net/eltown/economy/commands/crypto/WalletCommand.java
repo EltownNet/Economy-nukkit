@@ -50,17 +50,19 @@ public class WalletCommand extends PluginCommand<Economy> {
 
     private void openTransactions(final Player player) {
         Economy.getCryptoAPI().getTransactions(player.getName(), (transactions) -> {
-            final SimpleForm.Builder builder = new SimpleForm.Builder("§8» §fTransaktionen", "Hier siehst du die letzten Transaktion und Transaktionen, die noch bearbeitet werden.");
+            final SimpleForm.Builder builder = new SimpleForm.Builder("§7» §fTransaktionen", "Hier siehst du die letzten Transaktion und Transaktionen, die noch bearbeitet werden.");
+
+            builder.addButton(new ElementButton("§7» §cZurück"), this::openWallet);
 
             transactions.forEach((t) -> {
                 builder.addButton(new ElementButton(
-                        (!t.isCompleted() ? "§e#§f " : t.getFrom().equalsIgnoreCase(player.getName()) ? "§c-" : "§a+")
-                                + formatBalance(t.getAmount()) + " " + t.getType() + "\n§7" + t.getId()
+                        (t.getFrom().equalsIgnoreCase(player.getName()) ? "§c-" : "§a+") + formatBalance(t.getAmount()) + " " + t.getType() + "\n"
+                                + this.getProgressString(t.getMinutes(), t.getMinutesLeft())
                 ), (p) -> {
                     new SimpleForm.Builder(t.getId(),
                             "Status: " + (t.isCompleted() ? "§aAbgeschlossen" : "§eIn Bearbeitung")
                                     + "\n§rMenge: " + (t.getFrom().equalsIgnoreCase(player.getName()) ? "§c-" : "§a+") + formatBalance(t.getAmount()) + " " + t.getType()
-                                    + "\n§r"+ (t.getFrom().equalsIgnoreCase(player.getName()) ? "An: " + t.getTo() : "Von: " + t.getFrom())
+                                    + "\n§r" + (t.getFrom().equalsIgnoreCase(player.getName()) ? "An: " + t.getTo() : "Von: " + t.getFrom())
                     ).addButton(new ElementButton("§8» §4Zurück"), this::openTransactions)
                             .build().send(player);
                 });
@@ -71,12 +73,27 @@ public class WalletCommand extends PluginCommand<Economy> {
         });
     }
 
+    private String getProgressString(final int time, final int timeLeft) {
+        if (timeLeft == 0) return "§aAbgeschlossen";
+        final double percent = 100 - (((float) timeLeft / (float) time) * 100);
+
+        final long green = Math.round(percent);
+
+        final StringBuilder builder = new StringBuilder();
+
+        for (int i = 1; i <= 100; i++) {
+            builder.append(i <= green ? "§2|" : "§7|");
+        }
+
+        return "§8[" + builder.toString() + "§8]";
+    }
+
     private void openCrypto(final Player player, final CryptoType type, final double balance, final double worth) {
-        new SimpleForm.Builder(type.name(), "Verwalte hier deine " + type.name() + ".\nDu hast zurzeit " + formatBalance(balance) + " " + type.name())
-                .addButton(new ElementButton("§8» §f" + type.name() + " Kaufen"), (p) -> this.buyCrypto(player, type, worth))
-                .addButton(new ElementButton("§8» §f" + type.name() + " Verkaufen"), (p) -> this.sellCrypto(player, type, worth, balance))
-                .addButton(new ElementButton("§8» §f" + type.name() + " Überweisen"), (p) -> this.preTransferCrypto(player, type, worth, balance))
-                .addButton(new ElementButton("§8» §4Zurück"), this::openWallet)
+        new SimpleForm.Builder(type.name(), "Verwalte hier deine " + type.name() + ".\nDu hast zurzeit §9" + formatBalance(balance) + " " + type.name() + "§r\nDiese sind zurzeit insgesamt §a$" + this.getPlugin().getMoneyFormat().format(balance * worth) + "§r Wert.")
+                .addButton(new ElementButton("§7» §f" + type.name() + " Kaufen"), (p) -> this.buyCrypto(player, type, worth))
+                .addButton(new ElementButton("§7» §f" + type.name() + " Verkaufen"), (p) -> this.sellCrypto(player, type, worth, balance))
+                .addButton(new ElementButton("§7» §f" + type.name() + " Überweisen"), (p) -> this.preTransferCrypto(player, type, worth, balance))
+                .addButton(new ElementButton("§7» §4Zurück"), this::openWallet)
                 .build().send(player);
     }
 
@@ -128,7 +145,14 @@ public class WalletCommand extends PluginCommand<Economy> {
                         Economy.getAPI().hasAccount(user, (has) -> {
                             if (has) {
                                 if ((amount + cost) <= balance && amount >= 0.0001) {
-                                    new ModalForm.Builder("§8» §f" + type.name() + " Überweisen", "Möchtest du wirklich §a" + formatBalance(amount) + " " + type.name() + "§r an §a" + user + "§r überweisen?\n\nDies entspricht zurzeit §a" + Economy.getAPI().getMoneyFormat().format(worth * amount) + "$§r. Es kostet dich insgesamt §a" + formatBalance(amount + cost) + " " + type.name() + " (Betrag + Gebühren)§r.", "§8» §fJa", "§8» §fNein")
+                                    new ModalForm.Builder("§7» §f" + type.name() + " Überweisen",
+                                            type.name() + "-Überweisung an §9" + user + "§r."
+                                                    + "\n\nMenge: §9" + formatBalance(amount) + " " + type.name()
+                                                    + "\n§rTransfergebühren: §9" + formatBalance(cost) + " " + type.name()
+                                                    + "\n§rWert: §a$" + this.getPlugin().getMoneyFormat().format(worth * amount)
+                                                    + "\n\n§r§lZu zahlen: §r§9" + formatBalance(amount + cost) + " " + type.name(),
+                                            "§7» §aJa", "§7» §cNein")
+                                            //"Möchtest du wirklich §a" + formatBalance(amount) + " " + type.name() + "§r an §a" + user + "§r überweisen?\n\nDies entspricht zurzeit §a" + Economy.getAPI().getMoneyFormat().format(worth * amount) + "$§r. Es kostet dich insgesamt §a" + formatBalance(amount + cost) + " " + type.name() + " (Betrag + Gebühren)§r.", )
                                             .onYes((pp) -> {
                                                 Economy.getCryptoAPI().createTransfer(cost, amount, worth, type, pp, user, time);
                                                 p.sendMessage(Language.get("crypto.sent", formatBalance(amount), type, user));
@@ -152,8 +176,15 @@ public class WalletCommand extends PluginCommand<Economy> {
     }
 
     private void sellCrypto(final Player player, final CryptoType type, final double worth, final double balance) {
-        new CustomForm.Builder(("§8» §f" + type.name() + " Verkaufen"))
-                .addElement(new ElementLabel("Wie viel " + type.name() + " möchtest du verkaufen?"))
+        new CustomForm.Builder(("§7» §f" + type.name() + " Verkaufen"))
+                .addElement(new ElementLabel("Wie viel §9" + type.name() + "§r möchtest du verkaufen?\n\n"
+                        + "§lWertetabelle:§r\n"
+                        + "§91 " + type.name() + " §r= §a$" + this.getPlugin().getMoneyFormat().format(1 * worth)
+                        + "\n§90,1 " + type.name() + " §r= §a$" + this.getPlugin().getMoneyFormat().format(0.1 * worth)
+                        + "\n§90,01 " + type.name() + " §r= §a$" + this.getPlugin().getMoneyFormat().format(0.01 * worth)
+                        + "\n§90,001 " + type.name() + " §r= §a$" + this.getPlugin().getMoneyFormat().format(0.001 * worth)
+                        + "\n§90,0001 " + type.name() + " §r= §a$" + this.getPlugin().getMoneyFormat().format(0.0001 * worth)
+                ))
                 .addElement(new ElementInput("Betrag (Min. 0,0001; Max. " + formatBalance(balance) + ")", "0,0001", "0,0001"))
                 .onSubmit((p, f) -> {
                     try {
@@ -162,10 +193,16 @@ public class WalletCommand extends PluginCommand<Economy> {
                         if (amount >= 0.0001) {
                             if (amount <= balance) {
                                 final double earn = amount * worth;
-                                new ModalForm.Builder("§8» §f" + type.name() + " Kaufen",
-                                        "Möchtest du wirklich " + formatBalance(amount) + " " + type.name() + " für " + this.getPlugin().getMoneyFormat().format(earn) + "$ verkaufen?",
-                                        "§8» §fJa",
-                                        "§8» §fNein"
+                                new ModalForm.Builder("§7» §f" + type.name() + " Kaufen",
+                                        "Abschließen des Verkaufsvorgangs."
+                                                + "\n\nWährung: §9" + type.name()
+                                                + "§r\nMenge: §9" + formatBalance(amount)
+                                                + "§r\nPreis: §a$" + this.getPlugin().getMoneyFormat().format(earn)
+                                                + "§r\n\n§lDu erhälst: §r§a$" + this.getPlugin().getMoneyFormat().format(earn)
+                                        ,
+                                        //"Möchtest du wirklich " + formatBalance(amount) + " " + type.name() + " für " + this.getPlugin().getMoneyFormat().format(earn) + "$ verkaufen?",
+                                        "§7» §aJa",
+                                        "§7» §cNein"
                                 ).onYes((p1) -> {
                                     Economy.getCryptoAPI().sellCrypto(player, type, amount, earn);
                                     player.sendMessage(Language.get("crypto.sold", this.formatBalance(amount), type.name(), formatBalance(earn), Economy.getAPI().getMonetaryUnit()));
@@ -184,8 +221,14 @@ public class WalletCommand extends PluginCommand<Economy> {
     }
 
     private void buyCrypto(final Player player, final CryptoType type, final double worth) {
-        new CustomForm.Builder(("§8» §f" + type.name() + " Kaufen"))
-                .addElement(new ElementLabel("Wie viel " + type.name() + " möchtest du kaufen?"))
+        new CustomForm.Builder(("§7» §f" + type.name() + " Kaufen"))
+                .addElement(new ElementLabel("Wie viel §9" + type.name() + "§r möchtest du kaufen?\n\n"
+                        + "§lWertetabelle:§r\n"
+                        + "§a$10 §r= §9" + formatBalance(10 / worth) + " " + type.name()
+                        + "\n§a$100 §r= §9" + formatBalance(100 / worth) + " " + type.name()
+                        + "\n§a$1.000 §r= §9" + formatBalance(1000 / worth) + " " + type.name()
+                        + "\n§a$10.000 §r= §9" + formatBalance(10000 / worth) + " " + type.name()
+                ))
                 .addElement(new ElementInput("Betrag (Min. 0,0001)", "0,0001", "0,0001"))
                 .onSubmit((p, f) -> {
                     try {
@@ -196,10 +239,13 @@ public class WalletCommand extends PluginCommand<Economy> {
                             final double price = amount * worth;
                             Economy.getAPI().getMoney(player, (bal) -> {
                                 if (price <= bal) {
-                                    new ModalForm.Builder("§8» §f" + type.name() + " Kaufen",
-                                            "Möchtest du wirklich " + formatBalance(amount) + " " + type.name() + " für " + this.getPlugin().getMoneyFormat().format(price) + "$ kaufen?",
-                                            "§8» §fJa",
-                                            "§8» §fNein"
+                                    new ModalForm.Builder("§7» §f" + type.name() + " Kaufen",
+                                            "Abschließen des Kaufvorgangs.\n\nWährung: §9" + type.name()
+                                                    + "\n§rMenge: §9" + this.formatBalance(amount)
+                                                    + "\n§rPreis: §a$" + this.getPlugin().getMoneyFormat().format(price)
+                                                    + "\n\n§r§lZu zahlen: §r§a$" + this.getPlugin().getMoneyFormat().format(price),//"Möchtest du wirklich " + formatBalance(amount) + " " + type.name() + " für " + this.getPlugin().getMoneyFormat().format(price) + "$ kaufen?",
+                                            "§7» §aJa",
+                                            "§7» §cNein"
                                     ).onYes((p1) -> {
                                         Economy.getCryptoAPI().buyCrypto(player, type, amount, price);
                                         player.sendMessage(Language.get("crypto.bought", this.formatBalance(amount), type.name(), price, Economy.getAPI().getMonetaryUnit()));

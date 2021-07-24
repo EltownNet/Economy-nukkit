@@ -1,7 +1,9 @@
 package net.eltown.economy.components.economy.api;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import lombok.RequiredArgsConstructor;
+import net.eltown.economy.components.economy.event.MoneyChangeEvent;
 import net.eltown.economy.components.economy.provider.Provider;
 import net.eltown.economy.Economy;
 
@@ -63,6 +65,10 @@ public class API {
 
     public void setMoney(String username, double money) {
         CompletableFuture.runAsync(() -> {
+
+            final Player online = Server.getInstance().getPlayer(username);
+            if (online != null) Server.getInstance().getPluginManager().callEvent(new MoneyChangeEvent(online, money));
+
             this.provider.setMoney(username, money);
         });
     }
@@ -80,6 +86,10 @@ public class API {
     public void addMoney(String username, double money) {
         CompletableFuture.runAsync(() -> {
             this.provider.getMoney(username, (current) -> {
+
+                final Player online = Server.getInstance().getPlayer(username);
+                if (online != null) Server.getInstance().getPluginManager().callEvent(new MoneyChangeEvent(online, current + money));
+
                 this.provider.setMoney(username, current + money);
             });
         });
@@ -97,6 +107,10 @@ public class API {
     public void reduceMoney(String username, double money) {
         CompletableFuture.runAsync(() -> {
             this.provider.getMoney(username, (current) -> {
+
+                final Player online = Server.getInstance().getPlayer(username);
+                if (online != null) Server.getInstance().getPluginManager().callEvent(new MoneyChangeEvent(online, current - money));
+
                 this.provider.setMoney(username, current - money);
             });
         });

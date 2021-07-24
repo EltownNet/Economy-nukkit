@@ -123,11 +123,12 @@ public class CryptoAPI {
                             amount = Double.parseDouble(tdata[1]),
                             worth = Double.parseDouble(tdata[2]);
                     final int
-                            timeLeft = Integer.parseInt(tdata[6]);
+                            timeLeft = Integer.parseInt(tdata[6]),
+                            time = Integer.parseInt(tdata[8]);
                     final boolean
                             completed = Boolean.parseBoolean(tdata[7]);
 
-                    set.add(new Transaction(id, amount, worth, type, from, to, timeLeft, completed));
+                    set.add(new Transaction(id, amount, worth, type, from, to, timeLeft, time, completed));
                 }
 
                 callback.accept(set);
