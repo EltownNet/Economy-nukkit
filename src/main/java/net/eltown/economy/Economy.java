@@ -8,6 +8,7 @@ import lombok.SneakyThrows;
 import net.eltown.economy.commands.crypto.WalletCommand;
 import net.eltown.economy.commands.economy.*;
 import net.eltown.economy.commands.shops.SetShopPriceCommand;
+import net.eltown.economy.components.bank.api.BankAPI;
 import net.eltown.economy.components.crypto.api.CryptoAPI;
 import net.eltown.economy.components.economy.api.API;
 import net.eltown.economy.components.economy.language.Language;
@@ -26,6 +27,8 @@ public class Economy extends PluginBase {
     private static net.eltown.economy.components.economy.api.API API;
     @Getter
     private static CryptoAPI cryptoAPI;
+    @Getter
+    private static BankAPI bankAPI;
     @Getter
     private static ShopAPI shopAPI;
 
@@ -54,6 +57,7 @@ public class Economy extends PluginBase {
         API = new API(this, provider);
 
         cryptoAPI = new CryptoAPI(this);
+        bankAPI = new BankAPI(this);
         shopAPI = new ShopAPI(this);
     }
 
