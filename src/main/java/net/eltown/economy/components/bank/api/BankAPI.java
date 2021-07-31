@@ -9,21 +9,21 @@ import net.eltown.economy.components.bank.data.BankLog;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 @RequiredArgsConstructor
 public class BankAPI {
 
     private final Economy instance;
 
-    public void createBankAccount(final String owner, final String prefix, final Consumer<String> callbackPassword) {
+    public void createBankAccount(final String owner, final String prefix, final BiConsumer<String, String> callbackData) {
         this.instance.getRabbit().sendAndReceive(delivery -> {
             switch (BankCalls.valueOf(delivery.getKey().toUpperCase())) {
                 case CALLBACK_CREATE_ACCOUNT:
-                    callbackPassword.accept(delivery.getData()[1]);
+                    callbackData.accept(delivery.getData()[1], delivery.getData()[2]);
                     break;
             }
-        }, "bank.callback", BankCalls.CALLBACK_CREATE_ACCOUNT.name(), owner, prefix);
+        }, "bank.callback", BankCalls.REQUEST_CREATE_ACCOUNT.name(), owner, prefix);
     }
 
     public void insertBankLog(final String account, final String title, final String details) {
