@@ -8,8 +8,8 @@ import net.eltown.economy.components.bank.data.BankLog;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 @RequiredArgsConstructor
 public class BankAPI {
@@ -30,14 +30,12 @@ public class BankAPI {
         this.instance.getRabbit().send("bank.receive", BankCalls.REQUEST_INSERT_LOG.name(), account, title, details);
     }
 
-    public BankAccount getAccount(final String account) {
-        final AtomicReference<BankAccount> reference = new AtomicReference<>(null);
-
+    public void getAccount(final String account, final Consumer<BankAccount> bankAccountConsumer) {
         this.instance.getRabbit().sendAndReceive(delivery -> {
             switch (BankCalls.valueOf(delivery.getKey().toUpperCase())) {
                 case CALLBACK_GET_BANK_ACCOUNT:
-                    final String rawLogs = delivery.getData()[5];
-                    final String[] rawFullLog = rawLogs.split("#+#");
+                    final String rawLogs = delivery.getData()[6];
+                    final String[] rawFullLog = rawLogs.split("--");
 
                     final List<BankLog> logs = new ArrayList<>();
                     for (final String s : rawFullLog) {
@@ -45,12 +43,10 @@ public class BankAPI {
                         logs.add(new BankLog(log[0], log[1], log[2], log[3]));
                     }
 
-                    reference.set(new BankAccount(delivery.getData()[1], delivery.getData()[2], delivery.getData()[3], Double.parseDouble(delivery.getData()[4]), logs));
+                    bankAccountConsumer.accept(new BankAccount(delivery.getData()[1], delivery.getData()[2], delivery.getData()[3], delivery.getData()[4], Double.parseDouble(delivery.getData()[5]), logs));
                     break;
             }
         }, "bank.callback", BankCalls.REQUEST_GET_BANK_ACCOUNT.name(), account);
-
-        return reference.get();
     }
 
     public void withdrawMoney(final String account, final double amount) {
@@ -63,5 +59,13 @@ public class BankAPI {
 
     public void setMoney(final String account, final double amount) {
         this.instance.getRabbit().send("bank.receive", BankCalls.REQUEST_SET_MONEY.name(), account, String.valueOf(amount));
+    }
+
+    public void changePassword(final String account, final String password) {
+        this.instance.getRabbit().send("bank.receive", BankCalls.REQUEST_CHANGE_PASSWORD.name(), account, password);
+    }
+
+    public void changeDisplayName(final String account, final String displayName) {
+        this.instance.getRabbit().send("bank.receive", BankCalls.REQUEST_CHANGE_DISPLAY_NAME.name(), account, displayName);
     }
 }
