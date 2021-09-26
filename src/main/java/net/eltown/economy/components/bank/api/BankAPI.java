@@ -23,11 +23,11 @@ public class BankAPI {
                     callbackData.accept(delivery.getData()[1], delivery.getData()[2]);
                     break;
             }
-        }, "bank.callback", BankCalls.REQUEST_CREATE_ACCOUNT.name(), owner, prefix);
+        }, "api.bank.callback", BankCalls.REQUEST_CREATE_ACCOUNT.name(), owner, prefix);
     }
 
     public void insertBankLog(final String account, final String title, final String details) {
-        this.instance.getRabbit().send("bank.receive", BankCalls.REQUEST_INSERT_LOG.name(), account, title, details);
+        this.instance.getRabbit().send("api.bank.receive", BankCalls.REQUEST_INSERT_LOG.name(), account, title, details);
     }
 
     public void getAccount(final String account, final Consumer<BankAccount> bankAccountConsumer) {
@@ -46,26 +46,26 @@ public class BankAPI {
                     bankAccountConsumer.accept(new BankAccount(delivery.getData()[1], delivery.getData()[2], delivery.getData()[3], delivery.getData()[4], Double.parseDouble(delivery.getData()[5]), logs));
                     break;
             }
-        }, "bank.callback", BankCalls.REQUEST_GET_BANK_ACCOUNT.name(), account);
+        }, "api.bank.callback", BankCalls.REQUEST_GET_BANK_ACCOUNT.name(), account);
     }
 
     public void withdrawMoney(final String account, final double amount) {
-        this.instance.getRabbit().send("bank.receive", BankCalls.REQUEST_WITHDRAW_MONEY.name(), account, String.valueOf(amount));
+        this.instance.getRabbit().send("api.bank.receive", BankCalls.REQUEST_WITHDRAW_MONEY.name(), account, String.valueOf(amount));
     }
 
     public void depositMoney(final String account, final double amount) {
-        this.instance.getRabbit().send("bank.receive", BankCalls.REQUEST_DEPOSIT_MONEY.name(), account, String.valueOf(amount));
+        this.instance.getRabbit().send("api.bank.receive", BankCalls.REQUEST_DEPOSIT_MONEY.name(), account, String.valueOf(amount));
     }
 
     public void setMoney(final String account, final double amount) {
-        this.instance.getRabbit().send("bank.receive", BankCalls.REQUEST_SET_MONEY.name(), account, String.valueOf(amount));
+        this.instance.getRabbit().send("api.bank.receive", BankCalls.REQUEST_SET_MONEY.name(), account, String.valueOf(amount));
     }
 
     public void changePassword(final String account, final String password) {
-        this.instance.getRabbit().send("bank.receive", BankCalls.REQUEST_CHANGE_PASSWORD.name(), account, password);
+        this.instance.getRabbit().send("api.bank.receive", BankCalls.REQUEST_CHANGE_PASSWORD.name(), account, password);
     }
 
     public void changeDisplayName(final String account, final String displayName) {
-        this.instance.getRabbit().send("bank.receive", BankCalls.REQUEST_CHANGE_DISPLAY_NAME.name(), account, displayName);
+        this.instance.getRabbit().send("api.bank.receive", BankCalls.REQUEST_CHANGE_DISPLAY_NAME.name(), account, displayName);
     }
 }

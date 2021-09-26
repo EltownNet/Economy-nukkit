@@ -28,7 +28,7 @@ public class CryptoAPI {
                     Double.parseDouble(data[4])
             ));
 
-        }, "crypto.callback", CryptoCalls.REQUEST_WALLET.name(), player);
+        }, "api.crypto.callback", CryptoCalls.REQUEST_WALLET.name(), player);
     }
 
     public void addCrypto(final String player, final CryptoType type, final double amount) {
@@ -36,7 +36,7 @@ public class CryptoAPI {
             this.getWallet((wallet) -> {
                 switch (type) {
                     case CTC:
-                        this.plugin.getRabbit().send("crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
+                        this.plugin.getRabbit().send("api.crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
                                 player,
                                 "" + (wallet.getCtc() + amount),
                                 "" + wallet.getElt(),
@@ -44,7 +44,7 @@ public class CryptoAPI {
                         );
                         break;
                     case ELT:
-                        this.plugin.getRabbit().send("crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
+                        this.plugin.getRabbit().send("api.crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
                                 player,
                                 "" + wallet.getCtc(),
                                 "" + (wallet.getElt() + amount),
@@ -52,7 +52,7 @@ public class CryptoAPI {
                         );
                         break;
                     case NOT:
-                        this.plugin.getRabbit().send("crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
+                        this.plugin.getRabbit().send("api.crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
                                 player,
                                 "" + wallet.getCtc(),
                                 "" + wallet.getElt(),
@@ -69,7 +69,7 @@ public class CryptoAPI {
             this.getWallet((wallet) -> {
                 switch (type) {
                     case CTC:
-                        this.plugin.getRabbit().send("crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
+                        this.plugin.getRabbit().send("api.crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
                                 player,
                                 "" + (wallet.getCtc() - amount),
                                 "" + wallet.getElt(),
@@ -77,7 +77,7 @@ public class CryptoAPI {
                         );
                         break;
                     case ELT:
-                        this.plugin.getRabbit().send("crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
+                        this.plugin.getRabbit().send("api.crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
                                 player,
                                 "" + wallet.getCtc(),
                                 "" + (wallet.getElt() - amount),
@@ -85,7 +85,7 @@ public class CryptoAPI {
                         );
                         break;
                     case NOT:
-                        this.plugin.getRabbit().send("crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
+                        this.plugin.getRabbit().send("api.crypto.receive", CryptoCalls.UPDATE_WALLET.name(),
                                 player,
                                 "" + wallet.getCtc(),
                                 "" + wallet.getElt(),
@@ -133,7 +133,7 @@ public class CryptoAPI {
 
                 callback.accept(set);
 
-            }, "crypto.callback", CryptoCalls.REQUEST_TRANSACTIONS.name(), player);
+            }, "api.crypto.callback", CryptoCalls.REQUEST_TRANSACTIONS.name(), player);
         });
     }
 
@@ -142,7 +142,7 @@ public class CryptoAPI {
             final String[] data = delivery.getData();
 
             worth.accept(new Worth(Double.parseDouble(data[1]), Double.parseDouble(data[2]), Double.parseDouble(data[3])));
-        }, "crypto.callback", CryptoCalls.REQUEST_WORTH.name(), "null");
+        }, "api.crypto.callback", CryptoCalls.REQUEST_WORTH.name(), "null");
     }
 
     public void getTransactionPrices(final Consumer<double[]> callback) {
@@ -157,13 +157,13 @@ public class CryptoAPI {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-        }, "crypto.callback", CryptoCalls.REQUEST_TRANSFER_PRICES.name(), "null");
+        }, "api.crypto.callback", CryptoCalls.REQUEST_TRANSFER_PRICES.name(), "null");
     }
 
     public void createTransfer(final double price, final double amount, final double worth, final CryptoType type, final Player from, final String to, final int time) {
         this.sellCrypto(from, type, amount + price, 0);
 
-        this.plugin.getRabbit().send("crypto.receive", CryptoCalls.UPDATE_TRANSFER_CRYPTO.name(),
+        this.plugin.getRabbit().send("api.crypto.receive", CryptoCalls.UPDATE_TRANSFER_CRYPTO.name(),
                 type.name(),
                 "" + amount,
                 "" + (amount * worth),

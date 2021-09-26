@@ -51,7 +51,7 @@ public class Economy extends PluginBase {
         this.moneyFormat.setMaximumFractionDigits(2);
         this.cryptoFormat = new DecimalFormat();
         this.cryptoFormat.setMaximumFractionDigits(4); // 0.0001
-        this.rabbit = new TinyRabbit("localhost", "Economy/Server");
+        this.rabbit = new TinyRabbit("localhost", "Economy/System[Main]");
 
         this.provider = new Provider(this);
         API = new API(this, provider);

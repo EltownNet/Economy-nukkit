@@ -25,21 +25,21 @@ public class Provider {
     public void hasAccount(String id, Consumer<Boolean> callback) {
         this.plugin.getRabbit().sendAndReceive((delivery -> {
             callback.accept(delivery.getData()[1].equalsIgnoreCase("true"));
-        }), "economy", CallData.REQUEST_ACCOUNTEXISTS.name(), id);
+        }), "api.economy.callback", CallData.REQUEST_ACCOUNTEXISTS.name(), id);
     }
 
     public void createAccount(String id, double money) {
-        this.plugin.getRabbit().sendAndReceive((delivery -> {}), "economy", CallData.REQUEST_CREATEACCOUNT.name(), id, String.valueOf(money));
+        this.plugin.getRabbit().sendAndReceive((delivery -> {}), "api.economy.callback", CallData.REQUEST_CREATEACCOUNT.name(), id, String.valueOf(money));
     }
 
     public void getMoney(String id, Consumer<Double> callback) {
         this.plugin.getRabbit().sendAndReceive((delivery -> {
             callback.accept(Double.parseDouble(delivery.getData()[1]));
-        }), "economy", CallData.REQUEST_GETMONEY.name(), id);
+        }), "api.economy.callback", CallData.REQUEST_GETMONEY.name(), id);
     }
 
     public void setMoney(String id, double money) {
-        this.plugin.getRabbit().sendAndReceive((delivery -> {}), "economy", CallData.REQUEST_SETMONEY.name(), id, String.valueOf(money));
+        this.plugin.getRabbit().sendAndReceive((delivery -> {}), "api.economy.callback", CallData.REQUEST_SETMONEY.name(), id, String.valueOf(money));
     }
 
     public void getAll(Consumer<Map<String, Double>> callback) {
@@ -54,6 +54,6 @@ public class Provider {
             });
             callback.accept(map);
 
-        }), "economy", CallData.REQUEST_GETALL.name());
+        }), "api.economy.callback", CallData.REQUEST_GETALL.name());
     }
 }
