@@ -8,6 +8,7 @@ import net.eltown.economy.Economy;
 import net.eltown.economy.components.crypto.data.*;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -101,7 +102,7 @@ public class CryptoAPI {
         CompletableFuture.runAsync(() -> {
             this.plugin.getRabbit().sendAndReceive((delivery) -> {
 
-                final Set<Transaction> set = new HashSet<>();
+                final LinkedHashSet<Transaction> set = new LinkedHashSet<>();
 
                 final String[] data = delivery.getData();
                 if (data[1].equalsIgnoreCase("null")) {
