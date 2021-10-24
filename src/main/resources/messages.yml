@@ -25,7 +25,7 @@ money-other: "§a[0]§7 hat zurzeit §a[1][2]§7."
 
 # /setmoney
 # [0] = name of player, [1] = monetary unit, [2] = amount
-set-money: "§aSet money of [0] to [2][1]."
+set-money: "Das Bargeld von §a[0] §7wurde auf §a[2][1]§7 gesetzt."
 
 # /addmoney
 # [0] = name of player, [1] = monetary unit, [2] = amount
@@ -44,11 +44,11 @@ paid-you: "§a[0]§7 hat dir soeben §a[2][1] §7überwiesen."
 
 # /topmoney
 topmoney-invalid: "§cBitte gebe eine gültige Seitennummer an."
-topmoney-header: "§e--- Richest Players ---"
+topmoney-header: "§0--- Die reichsten Spieler ---"
 # [0] = position, [1] = playername, [2] = monetary unit, [3] = money
-topmoney-player: "§a[0]. [1] §6[3][2]"
-topmoney-siteinfo: "§aPage §a[§6[0]§a/§6[1]§a]"
-topmoney-footer: "§e--- Richest Players ---"
+topmoney-player: "§2[0]. [1] §f[3][2]"
+topmoney-siteinfo: "§2Seite §2[§f[0]§2/§f[1]§2]"
+topmoney-footer: "§0--- Die reichsten Spieler ---"
 
 # /lecoreload
 reload: "§7Lade Economy neu..."

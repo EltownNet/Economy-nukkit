@@ -67,7 +67,7 @@ public class Economy extends PluginBase {
 
         this.getLogger().info("§aStarting Economy...");
 
-        this.defaultMoney = config.getDouble("DefaultMoney");
+        this.defaultMoney = 0.0;
         this.monetaryUnit = config.getString("MonetaryUnit");
 
         this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
