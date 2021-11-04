@@ -39,7 +39,7 @@ public class BankAPI {
 
                     final List<BankLog> logs = new ArrayList<>();
                     for (final String s : rawFullLog) {
-                        final String[] log = s.split(";");
+                        final String[] log = s.split(";-;");
                         logs.add(new BankLog(log[0], log[1], log[2], log[3]));
                     }
 

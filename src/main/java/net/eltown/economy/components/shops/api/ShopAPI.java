@@ -5,7 +5,7 @@ import lombok.SneakyThrows;
 import net.eltown.economy.Economy;
 import net.eltown.economy.components.shops.data.ShopCalls;
 
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 @Getter
 public class ShopAPI {
@@ -17,10 +17,11 @@ public class ShopAPI {
         this.economy = economy;
     }
 
-    public void getCurrentPrice(final int[] id, final int amount, final Consumer<Double> callback) {
+    public void getCurrentPrice(final int[] id, final int amount, final BiConsumer<Double, Double> callback) {
         this.economy.getRabbit().sendAndReceive((delivery) -> {
-            final double price = Double.parseDouble(delivery.getData()[1]);
-            callback.accept(price * amount);
+            final double buy = Double.parseDouble(delivery.getData()[1]);
+            final double sell = Double.parseDouble(delivery.getData()[2]);
+            callback.accept(buy * amount, sell * amount);
         }, "api.shops.callback", ShopCalls.REQUEST_ITEM_PRICE.name(), id[0] + "", id[1] + "");
     }
 
